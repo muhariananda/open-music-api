@@ -48,7 +48,7 @@ const init = async () => {
         status: 'error',
         message: 'Unexpected internal server error',
       });
-      newResponse.statusCode(500);
+      newResponse.code(500);
 
       return newResponse;
     }
