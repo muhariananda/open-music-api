@@ -1,5 +1,6 @@
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
+const { buildGetSongQuery } = require('../../utils');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 
@@ -29,33 +30,8 @@ class SongsService {
   }
 
   async getSongs(title, performer) {
-    let queryText = 'SELECT id, title, performer FROM songs';
-    const values = [];
-
-    if (title || performer) {
-      queryText += ' WHERE ';
-      if (title) {
-        queryText += 'title ILIKE $1';
-        values.push(`%${title}%`);
-      }
-
-      if (title && performer) {
-        queryText += ' AND ';
-      }
-
-      if (performer) {
-        queryText += 'performer ILIKE $2';
-        values.push(`%${performer}%`);
-      }
-    }
-
-    const query = {
-      text: queryText,
-      values,
-    };
-
+    const query = buildGetSongQuery(title, performer);
     const result = await this._pool.query(query);
-
     return result.rows;
   }
 
