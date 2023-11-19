@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "start-dev": "nodemon ./src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint ./src",
     "migrate": "node-pg-migrate"
   },
