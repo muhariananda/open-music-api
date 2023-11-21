@@ -9,13 +9,18 @@ class SongsService {
     this._pool = new Pool();
   }
 
-  async addSong({
-    title, year, genre, performer, duration, albumId,
-  }) {
+  async addSong(song) {
+    const {
+      title, year, genre, performer, duration, albumId,
+    } = song;
+
     const id = `song-${nanoid(16)}`;
 
     const query = {
-      text: 'INSERT INTO songs VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+      text: `
+        INSERT INTO songs
+        VALUES($1, $2, $3, $4, $5, $6, $7)
+        RETURNING id`,
       values: [id, title, year, genre, performer, duration, albumId],
     };
 
@@ -50,11 +55,33 @@ class SongsService {
     return result.rows[0];
   }
 
-  async editSongById(id, {
-    title, year, genre, performer, duration, albumId,
-  }) {
+  async getSongsByAlbumId(id) {
     const query = {
-      text: 'UPDATE songs SET title = $1, year = $2, genre = $3, performer = $4, duration = $5, "albumId" = $6 WHERE id = $7 RETURNING id',
+      text: 'SELECT id, title, performer FROM songs WHERE "albumId" = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    return result.rows;
+  }
+
+  async editSongById(id, song) {
+    const {
+      title, year, genre, performer, duration, albumId,
+    } = song;
+
+    const query = {
+      text: `
+        UPDATE songs 
+        SET 
+          title = $1,
+          year = $2,
+          genre = $3,
+          performer = $4,
+          duration = $5,
+          "albumId" = $6
+        WHERE id = $7 RETURNING id`,
       values: [title, year, genre, performer, duration, albumId, id],
     };
 
