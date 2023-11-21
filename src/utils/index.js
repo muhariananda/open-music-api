@@ -1,3 +1,5 @@
+const currentYear = new Date().getFullYear();
+
 const buildGetSongQuery = (title, performer) => {
   let queryText = 'SELECT id, title, performer FROM songs';
   const titleTerm = `%${title}%`;
@@ -32,4 +34,4 @@ const buildGetSongQuery = (title, performer) => {
   return queryText;
 };
 
-module.exports = { buildGetSongQuery };
+module.exports = { buildGetSongQuery, currentYear };
