@@ -9,6 +9,19 @@ class SongsService {
     this._pool = new Pool();
   }
 
+  async verifySong(id) {
+    const query = {
+      text: 'SELECT * FROM songs WHERE id = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Song not found');
+    }
+  }
+
   async addSong(song) {
     const {
       title, year, genre, performer, duration, albumId,
