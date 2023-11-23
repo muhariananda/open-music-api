@@ -102,6 +102,8 @@ class PlaylistsService {
   }
 
   async verifyPlaylistCollaboration(id, userId) {
+    await this.verifyPlaylist(id);
+
     const query = {
       text: `
         SELECT p.id FROM playlists p
