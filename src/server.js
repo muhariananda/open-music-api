@@ -34,7 +34,7 @@ const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
   const songsService = new SongsService();
-  const albumsService = new AlbumsService(songsService);
+  const albumsService = new AlbumsService();
 
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationService();
@@ -59,7 +59,6 @@ const init = async () => {
     const { response } = request;
 
     if (response instanceof Error) {
-      console.error(response);
       if (response instanceof ClientError) {
         const newResponse = h.response({
           status: 'fail',
@@ -114,7 +113,8 @@ const init = async () => {
     {
       plugin: albums,
       options: {
-        service: albumsService,
+        albumsService,
+        songsService,
         validator: AlbumValidator,
       },
     },
