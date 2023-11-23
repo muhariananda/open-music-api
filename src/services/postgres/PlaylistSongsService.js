@@ -3,13 +3,11 @@ const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
 
 class PlaylistSongsService {
-  constructor(songsService) {
+  constructor() {
     this._pool = new Pool();
-    this._songsService = songsService;
   }
 
   async addSongToPlaylist(playlistId, songId) {
-    await this._songsService.verifySong(songId);
     const id = `playlist_song-${nanoid(16)}`;
 
     const query = {

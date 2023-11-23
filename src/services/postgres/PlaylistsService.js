@@ -9,27 +9,6 @@ class PlaylistsService {
     this._pool = new Pool();
   }
 
-  async verifyPlaylistOwner(id, owner) {
-    const query = {
-      text: 'SELECT * FROM playlists WHERE id = $1',
-      values: [id],
-    };
-
-    const result = await this._pool.query(query);
-
-    if (!result.rows.length) {
-      throw new NotFoundError('Playlist not found');
-    }
-
-    const playlist = result.rows[0];
-
-    if (playlist.owner !== owner) {
-      throw new AuthorizationError(
-        'You are not authorized to access this resource',
-      );
-    }
-  }
-
   async addPlaylist(name, owner) {
     const id = `playlists-${nanoid(16)}`;
 
@@ -54,7 +33,8 @@ class PlaylistsService {
         SELECT p.id, p.name, u.username 
         FROM playlists p 
         JOIN users u ON p.owner = u.id
-        WHERE p.owner = $1
+        LEFT JOIN collaborations c ON p.id = c.playlist_id
+        WHERE p.owner = $1 OR c.user_id = $1
       `,
       values: [owner],
     };
@@ -93,6 +73,50 @@ class PlaylistsService {
 
     if (!result.rows.length) {
       throw new NotFoundError('Failed to delete Playlist. Id not found');
+    }
+  }
+
+  async verifyPlaylist(id) {
+    const query = {
+      text: 'SELECT * FROM playlists WHERE id = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Playlist not found');
+    }
+
+    return result.rows[0];
+  }
+
+  async verifyPlaylistOwner(id, owner) {
+    const playlist = await this.verifyPlaylist(id);
+
+    if (playlist.owner !== owner) {
+      throw new AuthorizationError(
+        'You are not authorized to access this resource',
+      );
+    }
+  }
+
+  async verifyPlaylistCollaboration(id, userId) {
+    const query = {
+      text: `
+        SELECT p.id FROM playlists p
+        FULL JOIN collaborations c ON p.id = c.playlist_id
+        WHERE p.id = $1 AND (p.owner = $2 OR c.user_id = $2)
+      `,
+      values: [id, userId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new AuthorizationError(
+        'You are not authorized to access this resource',
+      );
     }
   }
 }
