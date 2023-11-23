@@ -11,7 +11,11 @@ class CollaborationsService {
     const id = `collaboration-${nanoid(16)}`;
 
     const query = {
-      text: 'INSERT INTO collaborations VALUES($1, $2, $3) RETURNING id',
+      text: `
+        INSERT INTO collaborations 
+        VALUES($1, $2, $3) 
+        RETURNING id
+      `,
       values: [id, playlistId, userId],
     };
 
@@ -27,7 +31,12 @@ class CollaborationsService {
 
   async deleteCollaboration(playlistId, userId) {
     const query = {
-      text: 'DELETE FROM collaborations WHERE playlist_id = $1 AND user_id = $2 RETURNING id',
+      text: `
+        DELETE FROM collaborations 
+        WHERE playlist_id = $1 
+        AND user_id = $2 
+        RETURNING id
+      `,
       values: [playlistId, userId],
     };
 

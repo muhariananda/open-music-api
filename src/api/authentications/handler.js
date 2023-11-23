@@ -39,12 +39,13 @@ class AuthenticationsHandler {
 
   async putAuthenticationHandler(request) {
     this._validator.validatePutAuthenticationPayload(request.payload);
-
     const { refreshToken } = request.payload;
-    await this._authenticationsService.verifyRefreshToken(refreshToken);
-    const { id } = this._tokenManager.verifyRefreshToken(refreshToken);
 
+    await this._authenticationsService.verifyRefreshToken(refreshToken);
+
+    const { id } = this._tokenManager.verifyRefreshToken(refreshToken);
     const accessToken = this._tokenManager.generateAccessToken(id);
+
     return {
       status: 'success',
       message: 'Access token successfully update',
@@ -56,8 +57,8 @@ class AuthenticationsHandler {
 
   async deleteAuthenticationHandler(request) {
     this._validator.validateDeleteAuthenticationPayload(request.payload);
-
     const { refreshToken } = request.payload;
+
     await this._authenticationsService.verifyRefreshToken(refreshToken);
     await this._authenticationsService.deleteRefreshToken(refreshToken);
 

@@ -6,7 +6,13 @@ const Actions = {
 };
 
 class PlaylistsHandler {
-  constructor(playlistsService, playlistSongsService, songsService, activitiesService, validator) {
+  constructor(
+    playlistsService,
+    playlistSongsService,
+    songsService,
+    activitiesService,
+    validator,
+  ) {
     this._playlistsService = playlistsService;
     this._playlistSongsService = playlistSongsService;
     this._songsService = songsService;
@@ -18,7 +24,6 @@ class PlaylistsHandler {
 
   async postPlaylistHandler(request, h) {
     this._validator.validatePlaylistPayload(request.payload);
-
     const { name } = request.payload;
     const { id: credentialId } = request.auth.credentials;
 
@@ -41,6 +46,7 @@ class PlaylistsHandler {
 
   async getPlaylistsHandler(request) {
     const { id: credentialId } = request.auth.credentials;
+
     const playlists = await this._playlistsService.getPlaylists(credentialId);
 
     return {
@@ -52,11 +58,11 @@ class PlaylistsHandler {
   }
 
   async deletePlaylistHandler(request) {
-    const { id } = request.params;
+    const { id: playlistId } = request.params;
     const { id: credentialId } = request.auth.credentials;
 
-    await this._playlistsService.verifyPlaylistOwner(id, credentialId);
-    await this._playlistsService.deletePlaylistById(id);
+    await this._playlistsService.verifyPlaylistOwner(playlistId, credentialId);
+    await this._playlistsService.deletePlaylistById(playlistId);
 
     return {
       status: 'success',
@@ -66,7 +72,6 @@ class PlaylistsHandler {
 
   async postSongToPlaylistHandler(request, h) {
     this._validator.validatePlaylistSongPayload(request.payload);
-
     const { id: playlistId } = request.params;
     const { id: userId } = request.auth.credentials;
     const { songId } = request.payload;
@@ -106,7 +111,6 @@ class PlaylistsHandler {
 
   async deleteSongFromPlaylistHandler(request) {
     this._validator.validatePlaylistSongPayload(request.payload);
-
     const { id: playlistId } = request.params;
     const { id: userId } = request.auth.credentials;
     const { songId } = request.payload;
