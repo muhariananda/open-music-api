@@ -26,6 +26,10 @@ const CollaborationValidator = require('./validator/collaborations');
 
 const ActivitiesService = require('./services/postgres/ActivitiesService');
 
+const _exports = require('./api/exports');
+const ProducerService = require('./services/rabbitmq/ProducerService');
+const ExportsValidator = require('./validator/exports');
+
 const songsService = new SongsService();
 const albumsService = new AlbumsService();
 
@@ -87,6 +91,14 @@ module.exports = [
       playlistsService,
       usersService,
       validator: CollaborationValidator,
+    },
+  },
+  {
+    plugin: _exports,
+    options: {
+      producerService: ProducerService,
+      playlistsService,
+      validator: ExportsValidator,
     },
   },
 ];
