@@ -38,7 +38,7 @@ const UploadValidator = require('./validator/uploads');
 
 const CacheService = require('./services/redis/CacheService');
 
-// init object
+// init
 const cacheService = new CacheService();
 
 const songsService = new SongsService();
