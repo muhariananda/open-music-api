@@ -1,5 +1,6 @@
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
+const { mapAlbumDBToAlbum } = require('../../utils');
 const NotFoundError = require('../../exceptions/NotFoundError');
 const InvariantError = require('../../exceptions/InvariantError');
 
@@ -39,7 +40,7 @@ class AlbumsService {
       throw new NotFoundError('Album not found');
     }
 
-    const album = result.rows[0];
+    const album = mapAlbumDBToAlbum(result.rows[0]);
     const songs = await this._songsService.getSongsByAlbumId(id);
     album.songs = songs;
 
@@ -63,7 +64,7 @@ class AlbumsService {
     const query = {
       text: `
         UPDATE albums
-        SET "coverUrl" = $1
+        SET cover_url = $1
         WHERE id = $2
         RETURNING id
       `,

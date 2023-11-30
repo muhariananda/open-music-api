@@ -1,4 +1,12 @@
+/* eslint-disable camelcase */
+
 const currentYear = new Date().getFullYear();
+
+const mapAlbumDBToAlbum = ({
+  id, name, year, cover_url,
+}) => ({
+  id, name, year, coverUrl: cover_url,
+});
 
 const buildGetSongQuery = (title, performer) => {
   let queryText = 'SELECT id, title, performer FROM songs';
@@ -34,4 +42,4 @@ const buildGetSongQuery = (title, performer) => {
   return queryText;
 };
 
-module.exports = { buildGetSongQuery, currentYear };
+module.exports = { mapAlbumDBToAlbum, buildGetSongQuery, currentYear };

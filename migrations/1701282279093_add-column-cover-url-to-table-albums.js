@@ -1,8 +1,6 @@
-/* eslint-disable camelcase */
-
 exports.up = (pgm) => {
   pgm.addColumn('albums', {
-    coverUrl: {
+    cover_url: {
       type: 'VARCHAR(225)',
     },
   });

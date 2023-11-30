@@ -1,7 +1,3 @@
-/* eslint-disable camelcase */
-
-exports.shorthands = undefined;
-
 exports.up = (pgm) => {
   pgm.createTable('songs', {
     id: {
@@ -28,14 +24,14 @@ exports.up = (pgm) => {
       type: 'INT',
       allowNull: true,
     },
-    albumId: {
+    album_id: {
       type: 'VARCHAR(225)',
       allowNull: true,
     },
   });
   pgm.addConstraint('songs', 'fk_albumId', {
     foreignKeys: {
-      columns: 'albumId',
+      columns: 'album_id',
       references: 'albums(id)',
       onDelete: 'cascade',
     },
