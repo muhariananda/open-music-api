@@ -9,7 +9,6 @@ module.exports = {
     {
       albumsService,
       albumLikesService,
-      songsService,
       storageService,
       albumValidator,
       uploadValidator,
@@ -18,7 +17,6 @@ module.exports = {
     const albumsHandler = new AlbumsHandler(
       albumsService,
       albumLikesService,
-      songsService,
       storageService,
       albumValidator,
       uploadValidator,

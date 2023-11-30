@@ -36,10 +36,14 @@ const ExportsValidator = require('./validator/exports');
 const StorageService = require('./services/storage/StorageService');
 const UploadValidator = require('./validator/uploads');
 
+const CacheService = require('./services/redis/CacheService');
+
 // init object
-const albumsService = new AlbumsService();
-const albumLikesService = new AlbumLikesService();
+const cacheService = new CacheService();
+
 const songsService = new SongsService();
+const albumsService = new AlbumsService(songsService);
+const albumLikesService = new AlbumLikesService(cacheService);
 
 const usersService = new UsersService();
 const authenticationsService = new AuthenticationService();
@@ -58,7 +62,6 @@ module.exports = [
     options: {
       albumsService,
       albumLikesService,
-      songsService,
       storageService,
       albumValidator: AlbumValidator,
       uploadValidator: UploadValidator,

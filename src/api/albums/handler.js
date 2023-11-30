@@ -4,14 +4,12 @@ class AlbumsHandler {
   constructor(
     albumsService,
     albumLikesService,
-    songsService,
     storageService,
     albumValidator,
     uploadValidator,
   ) {
     this._albumsService = albumsService;
     this._albumLikesService = albumLikesService;
-    this._songsService = songsService;
     this._storageService = storageService;
     this._albumValidator = albumValidator;
     this._uploadValidator = uploadValidator;
@@ -76,9 +74,6 @@ class AlbumsHandler {
     const { id } = request.params;
 
     const album = await this._albumsService.getAlbumById(id);
-    const songs = await this._songsService.getSongsByAlbumId(id);
-
-    album.songs = songs;
 
     return {
       status: 'success',
@@ -88,18 +83,21 @@ class AlbumsHandler {
     };
   }
 
-  async getAlbumLikesCountHandler(request) {
+  async getAlbumLikesCountHandler(request, h) {
     const { id: albumId } = request.params;
 
     await this._albumsService.verifyAlbum(albumId);
-    const likes = await this._albumLikesService.getLikesCount(albumId);
+    const { count, isCache } = await this._albumLikesService.getLikesCount(albumId);
 
-    return {
+    const response = h.response({
       status: 'success',
       data: {
-        likes,
+        likes: parseInt(count, 10),
       },
-    };
+    });
+    if (isCache) response.header('X-Data-Source', 'cache');
+
+    return response;
   }
 
   async putAlbumHandler(request) {
