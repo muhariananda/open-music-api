@@ -1,3 +1,5 @@
+const path = require('path');
+
 const albums = require('./api/albums');
 const AlbumsService = require('./services/postgres/AlbumsService');
 const AlbumValidator = require('./validator/albums');
@@ -30,6 +32,9 @@ const _exports = require('./api/exports');
 const ProducerService = require('./services/rabbitmq/ProducerService');
 const ExportsValidator = require('./validator/exports');
 
+const StorageService = require('./services/storage/StorageService');
+const UploadValidator = require('./validator/uploads');
+
 const songsService = new SongsService();
 const albumsService = new AlbumsService();
 
@@ -42,13 +47,17 @@ const playlistSongsService = new PlaylistSongsService();
 const collaborationsService = new CollaborationsService();
 const activitiesService = new ActivitiesService();
 
+const storageService = new StorageService(path.resolve(__dirname, 'api/albums/file/covers'));
+
 module.exports = [
   {
     plugin: albums,
     options: {
       albumsService,
       songsService,
-      validator: AlbumValidator,
+      storageService,
+      albumValidator: AlbumValidator,
+      uploadValidator: UploadValidator,
     },
   },
   {

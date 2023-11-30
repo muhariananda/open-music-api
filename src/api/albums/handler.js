@@ -1,16 +1,24 @@
 const autoBind = require('auto-bind');
 
 class AlbumsHandler {
-  constructor(albumsService, songsService, validator) {
+  constructor(
+    albumsService,
+    songsService,
+    storageService,
+    albumValidator,
+    uploadValidator,
+  ) {
     this._albumsService = albumsService;
     this._songsService = songsService;
-    this._validator = validator;
+    this._storageService = storageService;
+    this._albumValidator = albumValidator;
+    this._uploadValidator = uploadValidator;
 
     autoBind(this);
   }
 
   async postAlbumHandler(request, h) {
-    this._validator.validateAlbumPayload(request.payload);
+    this._albumValidator.validateAlbumPayload(request.payload);
 
     const albumId = await this._albumsService.addAlbum(request.payload);
 
@@ -43,7 +51,7 @@ class AlbumsHandler {
   }
 
   async putAlbumHandler(request) {
-    this._validator.validateAlbumPayload(request.payload);
+    this._albumValidator.validateAlbumPayload(request.payload);
     const { id } = request.params;
 
     await this._albumsService.editAlbumById(id, request.payload);
@@ -63,6 +71,26 @@ class AlbumsHandler {
       status: 'success',
       message: 'Album successfully to delete',
     };
+  }
+
+  async postAlbumCoverHandler(request, h) {
+    const { id: albumId } = request.params;
+    this._albumsService.verifyAlbum(albumId);
+
+    const { cover } = request.payload;
+    this._uploadValidator.validateImageHeaders(cover.hapi.headers);
+
+    const filename = await this._storageService.writeFile(cover, cover.hapi);
+    const fileLocation = `http://${process.env.HOST}:${process.env.PORT}/albums/covers/${filename}`;
+    this._albumsService.upsertAlbumCover(albumId, fileLocation);
+
+    const response = h.response({
+      status: 'success',
+      message: 'Sampul berhasil diunggah',
+    });
+    response.code(201);
+
+    return response;
   }
 }
 

@@ -54,6 +54,24 @@ class AlbumsService {
     }
   }
 
+  async upsertAlbumCover(id, fileLocation) {
+    const query = {
+      text: `
+        UPDATE albums
+        SET "coverUrl" = $1
+        WHERE id = $2
+        RETURNING id
+      `,
+      values: [fileLocation, id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new InvariantError('Failed to add album cover');
+    }
+  }
+
   async deleteAlbumById(id) {
     const query = {
       text: 'DELETE FROM albums WHERE id = $1 RETURNING id',
@@ -64,6 +82,19 @@ class AlbumsService {
 
     if (!result.rows.length) {
       throw new NotFoundError('Failed to delete album. Id not found');
+    }
+  }
+
+  async verifyAlbum(id) {
+    const query = {
+      text: 'SELECT id FROM albums WHERE id = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Album not found');
     }
   }
 }
