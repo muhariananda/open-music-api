@@ -8,6 +8,7 @@ module.exports = {
     server,
     {
       albumsService,
+      albumLikesService,
       songsService,
       storageService,
       albumValidator,
@@ -16,6 +17,7 @@ module.exports = {
   ) => {
     const albumsHandler = new AlbumsHandler(
       albumsService,
+      albumLikesService,
       songsService,
       storageService,
       albumValidator,

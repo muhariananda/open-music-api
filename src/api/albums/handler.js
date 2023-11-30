@@ -3,12 +3,14 @@ const autoBind = require('auto-bind');
 class AlbumsHandler {
   constructor(
     albumsService,
+    albumLikesService,
     songsService,
     storageService,
     albumValidator,
     uploadValidator,
   ) {
     this._albumsService = albumsService;
+    this._albumLikesService = albumLikesService;
     this._songsService = songsService;
     this._storageService = storageService;
     this._albumValidator = albumValidator;
@@ -34,6 +36,42 @@ class AlbumsHandler {
     return response;
   }
 
+  async postAlbumCoverHandler(request, h) {
+    const { id: albumId } = request.params;
+    await this._albumsService.verifyAlbum(albumId);
+
+    const { cover } = request.payload;
+    this._uploadValidator.validateImageHeaders(cover.hapi.headers);
+
+    const filename = await this._storageService.writeFile(cover, cover.hapi);
+    const fileLocation = `http://${process.env.HOST}:${process.env.PORT}/albums/covers/${filename}`;
+    this._albumsService.upsertAlbumCover(albumId, fileLocation);
+
+    const response = h.response({
+      status: 'success',
+      message: 'Sampul berhasil diunggah',
+    });
+    response.code(201);
+
+    return response;
+  }
+
+  async postAlbumLikeHandler(request, h) {
+    const { id: userId } = request.auth.credentials;
+    const { id: albumId } = request.params;
+
+    await this._albumsService.verifyAlbum(albumId);
+    await this._albumLikesService.addLike(userId, albumId);
+
+    const response = h.response({
+      status: 'success',
+      message: 'Success to like album',
+    });
+    response.code(201);
+
+    return response;
+  }
+
   async getAlbumByIdHandler(request) {
     const { id } = request.params;
 
@@ -46,6 +84,20 @@ class AlbumsHandler {
       status: 'success',
       data: {
         album,
+      },
+    };
+  }
+
+  async getAlbumLikesCountHandler(request) {
+    const { id: albumId } = request.params;
+
+    await this._albumsService.verifyAlbum(albumId);
+    const likes = await this._albumLikesService.getLikesCount(albumId);
+
+    return {
+      status: 'success',
+      data: {
+        likes,
       },
     };
   }
@@ -73,24 +125,17 @@ class AlbumsHandler {
     };
   }
 
-  async postAlbumCoverHandler(request, h) {
+  async deleteAlbumLikeHandler(request) {
+    const { id: userId } = request.auth.credentials;
     const { id: albumId } = request.params;
-    this._albumsService.verifyAlbum(albumId);
 
-    const { cover } = request.payload;
-    this._uploadValidator.validateImageHeaders(cover.hapi.headers);
+    await this._albumsService.verifyAlbum(albumId);
+    await this._albumLikesService.deleteLike(userId, albumId);
 
-    const filename = await this._storageService.writeFile(cover, cover.hapi);
-    const fileLocation = `http://${process.env.HOST}:${process.env.PORT}/albums/covers/${filename}`;
-    this._albumsService.upsertAlbumCover(albumId, fileLocation);
-
-    const response = h.response({
+    return {
       status: 'success',
-      message: 'Sampul berhasil diunggah',
-    });
-    response.code(201);
-
-    return response;
+      message: 'Success to delete like from album',
+    };
   }
 }
 

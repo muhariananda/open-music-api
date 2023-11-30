@@ -2,6 +2,7 @@ const path = require('path');
 
 const albums = require('./api/albums');
 const AlbumsService = require('./services/postgres/AlbumsService');
+const AlbumLikesService = require('./services/postgres/AlbumLikesService');
 const AlbumValidator = require('./validator/albums');
 
 const songs = require('./api/songs');
@@ -35,8 +36,10 @@ const ExportsValidator = require('./validator/exports');
 const StorageService = require('./services/storage/StorageService');
 const UploadValidator = require('./validator/uploads');
 
-const songsService = new SongsService();
+// init object
 const albumsService = new AlbumsService();
+const albumLikesService = new AlbumLikesService();
+const songsService = new SongsService();
 
 const usersService = new UsersService();
 const authenticationsService = new AuthenticationService();
@@ -54,6 +57,7 @@ module.exports = [
     plugin: albums,
     options: {
       albumsService,
+      albumLikesService,
       songsService,
       storageService,
       albumValidator: AlbumValidator,
