@@ -61,10 +61,14 @@ To get started with Open Music API, follow these steps:
 7. **API Documentation:**
     - Visit [API Documentation](docs/api.md) for detailed information on endpoints and usage.
 
+## Message Broker Queue Consumer
+
+For consumers, you can check it on the following page [open-music-queue-consumer](https://github.com/muhariananda/open-music-queue-consumer)
+
 ## API Documentation
 
 For detailed information on how to use the API, refer to the [API Documentation](docs/api.md).
 
 ---
 
-Happy coding! ❤️🖥️
+Happy coding! ❤️ 🖥️
